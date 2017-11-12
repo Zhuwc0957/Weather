@@ -2,6 +2,7 @@ package cn.edu.pku.ss.zhuwc.app;
 
 import android.app.Application;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.File;
@@ -9,7 +10,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import cn.edu.pku.ss.zhuwc.bean.City;
 import cn.edu.pku.ss.zhuwc.db.CityDB;
@@ -37,11 +41,11 @@ public class MyApplication extends Application {
     }
 
     private CityDB openCityDB() {
-        String path = "/data" + Environment.getDataDirectory().getAbsolutePath() + File.separator + getPackageName() + File.separator + "databases1" + File.separator + CityDB.CITY_DB_NAME;
+        String path = "/data" + Environment.getDataDirectory().getAbsolutePath() + File.separator + getPackageName() + File.separator + "databases" + File.separator + CityDB.CITY_DB_NAME;
         File db = new File(path);
         Log.d(TAG,path);
         if (!db.exists()) {
-            String pathfolder = "/data" + Environment.getDataDirectory().getAbsolutePath() + File.separator + getPackageName() + File.separator + "databases1" + File.separator;
+            String pathfolder = "/data" + Environment.getDataDirectory().getAbsolutePath() + File.separator + getPackageName() + File.separator + "databases" + File.separator;
             File dirFirstFolder = new File(pathfolder);
             if(!dirFirstFolder.exists()){
                 dirFirstFolder.mkdirs();
@@ -80,6 +84,7 @@ public class MyApplication extends Application {
 
     private boolean prepareCityList() {
         mCityList = mCityDB.getAllCity();
+
         int i=0;
         for (City city : mCityList) {
             i++;
@@ -91,7 +96,31 @@ public class MyApplication extends Application {
         return true;
     }
 
+    public List<City> prepareSelectCityList(String cmd)
+    {
+        CityDB newDb=openCityDB();
+        List<City> mNewCityList=new ArrayList<City>();
+        mNewCityList = newDb.selectCity(cmd);
+        int i=0;
+        for (City city : mNewCityList) {
+            i++;
+            String cityName = city.getCity();
+            String cityCode = city.getNumber();
+            Log.d(TAG,cityCode+":"+cityName);
+        }
+        Log.d(TAG,"i="+i);
+        return mNewCityList;
+    }
+
+    public String prepareSelectCityCode(String cityname)
+    {
+        CityDB newDb=openCityDB();
+        return newDb.selectCityCode(cityname);
+    }
+
+
     public List<City> getCityList() {
         return mCityList;
     }
+
 }

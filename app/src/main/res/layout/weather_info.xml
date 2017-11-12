@@ -177,8 +177,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/temp"
-            android:layout_centerInParent="true"
-            android:layout_marginTop="5.0dip" >
+            android:layout_marginTop="5.0dip"
+            android:layout_centerVertical="true">
             <!-- 天气情况图片示例 -->
             <ImageView
                 android:id="@+id/weather_img"
@@ -197,7 +197,9 @@
                 android:singleLine="true"
                 android:text="今天 星期三"
                 android:textColor="@android:color/white"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
             <!-- 温度范围 -->
             <TextView
                 android:id="@+id/temperature"
@@ -209,7 +211,9 @@
                 android:singleLine="true"
                 android:text="-2℃~7℃"
                 android:textColor="@android:color/white"
-                android:textSize="30.0sp" />
+                android:textSize="30.0sp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
             <!-- 天气状况 -->
             <TextView
                 android:id="@+id/climate"
@@ -221,7 +225,9 @@
                 android:singleLine="true"
                 android:text="多云转晴"
                 android:textColor="@android:color/white"
-                android:textSize="20.0sp" />
+                android:textSize="20.0sp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
             <!-- 风力信息 -->
             <TextView
                 android:id="@+id/wind"
@@ -233,10 +239,40 @@
                 android:singleLine="true"
                 android:text="微风"
                 android:textColor="@android:color/white"
-                android:textSize="20.0sp" />
+                android:textSize="20.0sp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
         </RelativeLayout>
     </RelativeLayout>
         <!-- 六日天气信息 -->
         <!-- 广告等信息 -->
+        <HorizontalScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_margin="10dp" >
+
+                <GridView
+                    android:id="@+id/grid"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center"
+                    android:numColumns="auto_fit"
+                    android:stretchMode="spacingWidthUniform" >
+                </GridView>
+            </LinearLayout>
+        </HorizontalScrollView>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/zhishu_list"></ListView>
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
