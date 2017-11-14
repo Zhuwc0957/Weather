@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -40,6 +42,8 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -77,6 +81,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private ImageView mUpdateBtn;
     private ImageView mCitySelect;
     private ImageView mLocationBtn;
+    private ImageView mShareBtn;
 
     private TextView cityTv,timeTv,humidityTv,weekTv,pmDataTv,pmQualityTv,temperatureTv,climateTv,windTv,city_name_Tv,tempTv;
     private ImageView weatherImg,pmImg;
@@ -85,7 +90,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private MyApplication myApplication;
 
-    public LocationClient mLocationClient = null;
+    public LocationClient mLocationClient = null;//定位
     private MyLocationListeners myListener = new MyLocationListeners();
     private String locCityCode;
 
@@ -98,13 +103,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
         {
             switch (msg.what){
                 case UPDATE_TODAY_WEATHER:
-                    updateTodayWeather((TodayWeather) msg.obj);
+                    updateTodayWeather((TodayWeather) msg.obj);//更新今日天气
                     break;
                 case 2:
-                    setGridView((ArrayList<TodayWeather>)msg.obj);
+                    setGridView((ArrayList<TodayWeather>)msg.obj);//更新预报天气
                     break;
                 case 3:
-                    setZhishuList((ArrayList<Map<String,String>>)msg.obj);
+                    setZhishuList((ArrayList<Map<String,String>>)msg.obj);//更新天气指数
                     break;
                 default:
                     break;
@@ -112,7 +117,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     };
 
-    void initView(){
+    void initView(){//初始化应用界面
         city_name_Tv = (TextView) findViewById(R.id.title_city_name);
         cityTv = (TextView) findViewById(R.id.city);
         timeTv = (TextView) findViewById(R.id.time);
@@ -144,8 +149,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
     {
 //        Button bt;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.weather_info);
-        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService("layout_inflater");
+        setContentView(R.layout.weather_info);//指定布局
+        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService("layout_inflater");//主要是用于加载布局
         gridView=(GridView)findViewById(R.id.grid);
         listView=(ListView)findViewById(R.id.zhishu_list) ;
         locCityCode="";
@@ -163,7 +168,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         //option.setScanSpan(5000);   //设置发起定位请求的间隔时间为5000ms
         option.disableCache(false); //禁止启用缓存定位
         mLocationClient.setLocOption(option);
-        mLocationClient.start();
+        mLocationClient.start();//获取位置信息
 
 
 
@@ -172,18 +177,20 @@ public class MainActivity extends Activity implements View.OnClickListener{
         mUpdateBtn.setOnClickListener(this);
         mLocationBtn=(ImageView)findViewById(R.id.title_location);
         mLocationBtn.setOnClickListener(this);
+        mShareBtn=(ImageView)findViewById(R.id.title_share);
+        mShareBtn.setOnClickListener(this);
         initView();
 
         Log.d("codetest","test2"+locCityCode);
 
-        if (NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
+        if (NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {//有网络时更新最新的天气数据
             myPreferences=getSharedPreferences("users",MODE_PRIVATE);
             String cityCode=myPreferences.getString("cityCode","101010100");
             queryWeatherCode(cityCode);
             Log.d("codetest","my"+ cityCode);
             Log.d("myWeather", "网络OK");
             Toast.makeText(MainActivity.this,"网络OK！", Toast.LENGTH_LONG).show();
-        }else {
+        }else {//无网络是使用myPreferences保存的天气数据
             myPreferences=getSharedPreferences("users",MODE_PRIVATE);
             Log.d("tests","1");
             String weatherdata=myPreferences.getString("weatherdata","");
@@ -202,17 +209,17 @@ public class MainActivity extends Activity implements View.OnClickListener{
     @Override
     public void onClick(View view)
     {
-        if(view.getId()==R.id.title_city_manager)
+        if(view.getId()==R.id.title_city_manager)//选择城市按钮调用的方法
         {
             Intent i=new Intent(this,SelectCity.class);
-            startActivityForResult(i,1);
+            startActivityForResult(i,1);//在一个主界面(主Activity)通过意图跳转至多个不同子Activity上去，当子模块的代码执行完毕后再次返回主页面，将子activity中得到的数据显示在主界面/完成的数据交给主Activity处理。
         }
 
-        if(view.getId()==R.id.title_update_btn){
+        if(view.getId()==R.id.title_update_btn){//更新天气按钮
 //            SharedPreferences sharedPreferences =getSharedPreferences("config",MODE_PRIVATE);
 //            String cityCode=sharedPreferences.getString("main_city_code","101010100");
             myPreferences=getSharedPreferences("users",MODE_PRIVATE);
-            String cityCode=myPreferences.getString("cityCode","101010100");
+            String cityCode=myPreferences.getString("cityCode","101010100");//读取myPreference存储的数据
             Log.d("MyWeather",cityCode);
             if (NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
                 Log.d("myWeather", "网络OK");
@@ -225,22 +232,39 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
         if(view.getId()==R.id.title_location)
         {
-            myApplication=MyApplication.getInstance();
-            mLocationClient.start();
-            Log.d("codetest",locCityCode);
-            String citycode=myApplication.prepareSelectCityCode(locCityCode);
-            Log.d("codetest",citycode);
-            myPreferences=getSharedPreferences("users",MODE_PRIVATE);
-            SharedPreferences.Editor editor=myPreferences.edit();
-            editor.putString("cityCode",citycode);
-            editor.commit();
-            queryWeatherCode(citycode);
+           if(NetUtil.getNetworkState(this)!=NetUtil.NETWORN_NONE){//获取位置信息并更新天气数据
+               myApplication=MyApplication.getInstance();
+               mLocationClient.start();
+               Log.d("codetest",locCityCode);
+               String citycode=myApplication.prepareSelectCityCode(locCityCode);
+               Log.d("codetest",citycode);
+               myPreferences=getSharedPreferences("users",MODE_PRIVATE);
+               SharedPreferences.Editor editor=myPreferences.edit();
+               editor.putString("cityCode",citycode);
+               editor.commit();//更新myPreference的城市代码
+               queryWeatherCode(citycode);
+           }
+           else{
+               Toast.makeText(MainActivity.this,"网络挂了,定位失败！",Toast.LENGTH_LONG).show();
+           }
+        }
+
+        if(view.getId()==R.id.title_share){//分享
+            String imgpath=screenshot();//截屏并获取截屏的保存路径
+            Intent intent = new Intent(Intent.ACTION_SEND); // 启动分享发送的属性
+            File file = new File(imgpath);//读取截屏
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));// 分享的内容
+            intent.setType("image/*");// 分享发送的数据类型
+            Intent chooser = Intent.createChooser(intent, "Share screen shot");
+            if(intent.resolveActivity(getPackageManager()) != null){
+                startActivity(chooser);//启动要分享到应用
+            }
         }
     }
 
-    protected void onActivityResult(int requestCode,int resultCode,Intent data)
+    protected void onActivityResult(int requestCode,int resultCode,Intent data)//子activity执行结束后回调该函数
     {
-        if(requestCode==1&&resultCode==RESULT_OK)
+        if(requestCode==1&&resultCode==RESULT_OK)//requestCode为1即为selectcity结束后的返回
         {
             String newCityCode=data.getStringExtra("cityCode");
             Log.d("myWeather","选择的城市代码为"+newCityCode);
@@ -263,11 +287,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     }
     private void queryWeatherCode(String cityCode) {
-        final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
+        final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;//拼接获取天气的网址
         Log.d("myWeather", address);
         new Thread(new Runnable() {
             @Override
-            public void run() {
+            public void run() {//获取天气数据并转化成字符串
                 HttpURLConnection con=null;
                 TodayWeather todayWeather =null;
                 List<TodayWeather> forcastWeather=null;
@@ -278,7 +302,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     con.setRequestMethod("GET");
                     con.setConnectTimeout(8000);
                     con.setReadTimeout(8000);
-                    InputStream in = con.getInputStream();
+                    InputStream in = con.getInputStream();//获取天气数据流
 
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     StringBuilder response = new StringBuilder();
@@ -288,7 +312,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                         Log.d("myWeather", str);
                     }
                     String responseStr=response.toString();
-                    myPreferences=getSharedPreferences("users",MODE_PRIVATE);
+                    myPreferences=getSharedPreferences("users",MODE_PRIVATE);//更新
                     SharedPreferences.Editor editor=myPreferences.edit();
                     editor.putString("weatherdata",responseStr);
                     editor.commit();
@@ -304,7 +328,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                         Message msg =new Message();
                         msg.what = UPDATE_TODAY_WEATHER;
                         msg.obj=todayWeather;
-                        mHandler.sendMessage(msg);
+                        mHandler.sendMessage(msg);//给mHandler发送消息
                     }
                     if(forcastWeather!=null)
                     {
@@ -336,7 +360,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }).start();
     }
 
-    public List<Map<String,String>> getZhishu(InputStream is)
+    public List<Map<String,String>> getZhishu(InputStream is)//获取天气指数的列表
     {
         List<Map<String ,String>> zhishuList=new ArrayList<Map<String, String>>();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -377,7 +401,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                             maps.put("name",element.getFirstChild().getNodeValue());
                         }
                         else if ("value".equals(element.getNodeName()))
-                        { //判断是否是age节点
+                        { //判断是否是value节点
                             maps.put("value",element.getFirstChild().getNodeValue());
                         }
                         else  if("detail".equals(element.getNodeName()))
@@ -402,7 +426,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         return zhishuList;
     }
-    public List<TodayWeather> forcastXML(InputStream is)
+    public List<TodayWeather> forcastXML(InputStream is)//获取未来四天天气的列表
     {
         List<TodayWeather> forcastWeather=new ArrayList<TodayWeather>();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -485,7 +509,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         return forcastWeather;
     }
 
-    public TodayWeather parseXML(String xmldata)
+    public TodayWeather parseXML(String xmldata)//解析今日天气
     {
         TodayWeather todayWeather = null;
 
@@ -600,7 +624,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         return todayWeather;
     }
 
-    public void updateTodayWeather(TodayWeather todayWeather){
+    public void updateTodayWeather(TodayWeather todayWeather){//更新界面
         city_name_Tv.setText(todayWeather.getCity()+"天气");
         myPreferences=getSharedPreferences("users",MODE_PRIVATE);
         SharedPreferences.Editor editor=myPreferences.edit();
@@ -713,7 +737,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     }
 
-    private void setGridView(List<TodayWeather> x) {
+    private void setGridView(List<TodayWeather> x) {//设置gridview，绑定adapter
 
         int size = x.size();
 
@@ -737,7 +761,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         Log.d("forcastWeathers", "update");
     }
 
-    public class GridViewAdapter extends BaseAdapter {
+    public class GridViewAdapter extends BaseAdapter {//自定义gridviewadapter
         Context context;
         List<TodayWeather> list;
 
@@ -802,7 +826,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
 
     }
-    public class zhishuListAdapter extends BaseAdapter{
+    public class zhishuListAdapter extends BaseAdapter{//自定义listviewadapter
         Context context;
         List<Map<String,String>> list;
 
@@ -842,9 +866,34 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     }
 
-    public void  setZhishuList(List<Map<String,String>> zhishuLists)
+    public void  setZhishuList(List<Map<String,String>> zhishuLists)//天气指数listview绑定adapter
     {
         zhishuListAdapter adapter=new zhishuListAdapter(getApplicationContext(),zhishuLists);
         listView.setAdapter(adapter);
+    }
+
+    private String screenshot() {//截屏并返回路径
+        // 获取屏幕
+        String imagePath="";
+        View dView = getWindow().getDecorView();
+        dView.setDrawingCacheEnabled(true);
+        dView.buildDrawingCache();
+        Bitmap bmp = dView.getDrawingCache();
+        if (bmp != null)
+        {
+            try {
+                // 获取内置SD卡路径
+                String sdCardPath = Environment.getExternalStorageDirectory().getPath();
+                // 图片文件路径
+                imagePath = sdCardPath + File.separator + "screenshot.png";
+                File file = new File(imagePath);
+                FileOutputStream os = new FileOutputStream(file);
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, os);
+                os.flush();
+                os.close();
+            } catch (Exception e) {
+            }
+        }
+        return imagePath;
     }
 }

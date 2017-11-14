@@ -40,7 +40,7 @@ public class MyApplication extends Application {
         return mApplication;
     }
 
-    private CityDB openCityDB() {
+    private CityDB openCityDB() {//连接数据库
         String path = "/data" + Environment.getDataDirectory().getAbsolutePath() + File.separator + getPackageName() + File.separator + "databases" + File.separator + CityDB.CITY_DB_NAME;
         File db = new File(path);
         Log.d(TAG,path);
@@ -82,7 +82,7 @@ public class MyApplication extends Application {
         }).start();
     }
 
-    private boolean prepareCityList() {
+    private boolean prepareCityList() {//查询所有城市
         mCityList = mCityDB.getAllCity();
 
         int i=0;
@@ -96,7 +96,7 @@ public class MyApplication extends Application {
         return true;
     }
 
-    public List<City> prepareSelectCityList(String cmd)
+    public List<City> prepareSelectCityList(String cmd)//根据输入查询城市
     {
         CityDB newDb=openCityDB();
         List<City> mNewCityList=new ArrayList<City>();
@@ -112,7 +112,7 @@ public class MyApplication extends Application {
         return mNewCityList;
     }
 
-    public String prepareSelectCityCode(String cityname)
+    public String prepareSelectCityCode(String cityname)//根据城市名查询城市代码
     {
         CityDB newDb=openCityDB();
         return newDb.selectCityCode(cityname);

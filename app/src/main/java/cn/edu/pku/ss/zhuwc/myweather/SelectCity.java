@@ -66,7 +66,7 @@ public class SelectCity extends AppCompatActivity implements View.OnClickListene
         CityList=(ListView)findViewById(R.id.city_list);
         //ArrayAdapter<String> adapter=new ArrayAdapter<String>(SelectCity.this,android.R.layout.simple_list_item_1,mArraylist);
         final SimpleAdapter adapter=new SimpleAdapter(SelectCity.this,mArraylist,R.layout.item,new String[]{"cityname","citycode"},new int[]{R.id.c_name,R.id.c_code});
-        CityList.setAdapter(adapter);
+        CityList.setAdapter(adapter);//ListView显示所有城市
         editText=(ClearEditText)findViewById(R.id.search_name);
         editText.addTextChangedListener(new TextWatcher() {
             @Override
