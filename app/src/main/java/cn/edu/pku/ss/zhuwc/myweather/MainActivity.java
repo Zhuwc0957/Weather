@@ -23,6 +23,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,6 +83,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private ImageView mCitySelect;
     private ImageView mLocationBtn;
     private ImageView mShareBtn;
+    private ProgressBar mUpdateBar;
 
     private TextView cityTv,timeTv,humidityTv,weekTv,pmDataTv,pmQualityTv,temperatureTv,climateTv,windTv,city_name_Tv,tempTv;
     private ImageView weatherImg,pmImg;
@@ -111,6 +113,14 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 case 3:
                     setZhishuList((ArrayList<Map<String,String>>)msg.obj);//更新天气指数
                     break;
+                case 5:
+                    mUpdateBar.setVisibility(View.INVISIBLE);
+                    mUpdateBtn.setVisibility(View.VISIBLE);
+                    break;
+                case 4:
+                    mUpdateBtn.setVisibility(View.INVISIBLE);
+                    mUpdateBar.setVisibility(View.VISIBLE);
+                    break;
                 default:
                     break;
             }
@@ -118,6 +128,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     };
 
     void initView(){//初始化应用界面
+        mUpdateBar=(ProgressBar)findViewById(R.id.title_update_progress);
         city_name_Tv = (TextView) findViewById(R.id.title_city_name);
         cityTv = (TextView) findViewById(R.id.city);
         timeTv = (TextView) findViewById(R.id.time);
@@ -131,6 +142,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         windTv = (TextView) findViewById(R.id.wind);
         weatherImg = (ImageView) findViewById(R.id.weather_img);
         tempTv=(TextView)findViewById(R.id.temp);
+        mUpdateBar.setVisibility(View.GONE);
         city_name_Tv.setText("N/A");
         cityTv.setText("N/A");
         timeTv.setText("N/A");
@@ -218,17 +230,38 @@ public class MainActivity extends Activity implements View.OnClickListener{
         if(view.getId()==R.id.title_update_btn){//更新天气按钮
 //            SharedPreferences sharedPreferences =getSharedPreferences("config",MODE_PRIVATE);
 //            String cityCode=sharedPreferences.getString("main_city_code","101010100");
+
             myPreferences=getSharedPreferences("users",MODE_PRIVATE);
-            String cityCode=myPreferences.getString("cityCode","101010100");//读取myPreference存储的数据
+            final String cityCode=myPreferences.getString("cityCode","101010100");//读取myPreference存储的数据
             Log.d("MyWeather",cityCode);
             if (NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
                 Log.d("myWeather", "网络OK");
-                queryWeatherCode(cityCode);
+                new Thread(new Runnable(){
+                    @Override
+                    public void run()
+                    {
+                        try {
+                            Message msg =new Message();
+                            msg.what =4;
+                            mHandler.sendMessage(msg);//给mHandler发送消息
+                            Thread.sleep(1500);
+                            queryWeatherCode(cityCode);
+                            Message msg1 =new Message();
+                            msg1.what =5;
+                            mHandler.sendMessage(msg1);//给mHandler发送消息
+
+                        }catch (InterruptedException e){}
+                    }
+                }).start();
+                //queryWeatherCode(cityCode);
             }else
             {
                 Log.d("myWeather", "网络挂了");
                 Toast.makeText(MainActivity.this,"网络挂了！",Toast.LENGTH_LONG).show();
             }
+            Message msg =new Message();
+            msg.what =4;
+            mHandler.sendMessage(msg);//给mHandler发送消息
         }
         if(view.getId()==R.id.title_location)
         {
@@ -693,6 +726,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             //打印出当前位置
             locCityCode=location.getCity();
             locCityCode=locCityCode.replace("市","");
+            Log.i("jingweidu", lati+"  "+longa);
             Log.i("TAGs", locCityCode);
             Log.i("TAGs", "location.getAddrStr()=" + location.getAddrStr());
             //打印出当前城市

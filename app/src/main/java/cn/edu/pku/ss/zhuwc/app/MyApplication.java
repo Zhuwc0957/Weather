@@ -90,10 +90,27 @@ public class MyApplication extends Application {
             i++;
             String cityName = city.getCity();
             String cityCode = city.getNumber();
-            Log.d(TAG,cityCode+":"+cityName);
+            String cityPy=city.getFirstPY();
+            Log.d(TAG,cityCode+":"+cityName+":"+cityPy);
         }
         Log.d(TAG,"i="+i);
         return true;
+    }
+
+    public List<City> prepareSelectCityBych(String ch)
+    {
+        CityDB newDb=openCityDB();
+        List<City> mNewCityList=new ArrayList<City>();
+        mNewCityList = newDb.selectCityByCharacter(ch);
+        int i=0;
+        for (City city : mNewCityList) {
+            i++;
+            String cityName = city.getCity();
+            String cityCode = city.getNumber();
+            Log.d(TAG,cityCode+":"+cityName);
+        }
+        Log.d(TAG,"i="+i);
+        return mNewCityList;
     }
 
     public List<City> prepareSelectCityList(String cmd)//根据输入查询城市

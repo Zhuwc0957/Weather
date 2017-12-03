@@ -37,18 +37,26 @@
             android:layout_alignParentRight="true"
             android:layout_gravity="center"
             android:src="@drawable/title_update"/>
+        <ProgressBar
+            android:layout_width="45dip"
+            android:layout_height="45dip"
+            android:layout_alignParentRight="true"
+            android:id="@+id/title_update_progress"
+            android:layout_gravity="center"
+            style="@style/title_update_progressbar_style"/>
         <ImageView
             android:layout_width="45.0dp"
             android:layout_height="45.0dp"
             android:id="@+id/title_share"
             android:layout_toLeftOf="@id/title_update_btn"
-            android:src="@drawable/title_share"/>
+            android:src="@drawable/title_share" />
         <ImageView
             android:layout_width="45.0dp"
             android:layout_height="45.0dp"
             android:id="@+id/title_location"
             android:layout_toLeftOf="@id/title_share"
             android:src="@drawable/base_action_bar_action_city"/>
+
     </RelativeLayout>
     <LinearLayout
         android:layout_width="fill_parent"
@@ -276,3 +284,4 @@
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
+

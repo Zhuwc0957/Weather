@@ -10,8 +10,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="20dp"/>
-            %android:textColor="#FF09090A"/>
+            android:textSize="30dip"
+            android:textColor="#FFFFFF"/>
         <TextView
             android:id="@+id/c_code"
             android:layout_width="wrap_content"

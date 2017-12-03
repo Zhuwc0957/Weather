@@ -22,7 +22,7 @@ public class CityDB {
     }
     public List<City> getAllCity() {//获取所有城市
         List<City> list = new ArrayList<City>();
-        Cursor c = db.rawQuery("SELECT * from " + CITY_TABLE_NAME, null);
+        Cursor c = db.rawQuery("SELECT * from " + CITY_TABLE_NAME+" order by allpy asc", null);
         while (c.moveToNext()) {
             String province = c.getString(c.getColumnIndex("province"));
             String city = c.getString(c.getColumnIndex("city"));
@@ -53,6 +53,25 @@ public class CityDB {
         }
         return list;
     }
+
+    public List<City>  selectCityByCharacter(String cmd)//条件查询数据库获取城市
+    {
+        List<City> list =new ArrayList<City>();
+        //Cursor c = db.rawQuery("SELECT * from " + CITY_TABLE_NAME, null);
+        Cursor c = db.rawQuery("SELECT * from " + CITY_TABLE_NAME+" where firstpy='"+cmd+"' order by allpy asc",null);
+        while (c.moveToNext()) {
+            String province = c.getString(c.getColumnIndex("province"));
+            String city = c.getString(c.getColumnIndex("city"));
+            String number = c.getString(c.getColumnIndex("number"));
+            String allPY = c.getString(c.getColumnIndex("allpy"));
+            String allFirstPY = c.getString(c.getColumnIndex("allfirstpy"));
+            String firstPY = c.getString(c.getColumnIndex("firstpy"));
+            City item = new City(province, city, number, firstPY, allPY,allFirstPY);
+            list.add(item);
+        }
+        return list;
+    }
+
     public String  selectCityCode(String cityname)//根据城市名获取城市代码
     {
         String citycode="";

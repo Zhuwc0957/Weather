@@ -111,16 +111,14 @@ public class ClearEditText extends EditText implements
      * 当输入框里面内容发生变化的时候回调的方法
      */
     @Override
-    public void onTextChanged(CharSequence s, int start, int count,
-                              int after) {
+    public void onTextChanged(CharSequence s, int start, int count, int after) {
         if(hasFoucs){
             setClearIconVisible(s.length() > 0);
         }
     }
 
     @Override
-    public void beforeTextChanged(CharSequence s, int start, int count,
-                                  int after) {
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
     }
 

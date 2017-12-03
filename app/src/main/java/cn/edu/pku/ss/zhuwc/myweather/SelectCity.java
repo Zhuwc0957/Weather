@@ -39,6 +39,7 @@ public class SelectCity extends AppCompatActivity implements View.OnClickListene
     private  ArrayList<Map<String,String>> mArraylist;
     private  ArrayList<Map<String,String>> mNewArrayList;
     private List<City> mNewList;
+    private SideBar sideBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +55,7 @@ public class SelectCity extends AppCompatActivity implements View.OnClickListene
         mList=myApplication.getCityList();
         mArraylist=new ArrayList<Map<String,String>>();
         mNewArrayList=new ArrayList<Map<String, String>>();
+        sideBar=(SideBar) findViewById(R.id.sidebar);
         for(int i=0;i<mList.size();i++)
         {
             Map<String,String> listitem=new HashMap<String, String>();
@@ -109,7 +111,27 @@ public class SelectCity extends AppCompatActivity implements View.OnClickListene
         };
         CityList.setOnItemClickListener(itemClickListener);
 
-    }
+        sideBar.setOnTouchingLetterChangedListener(new SideBar.OnTouchingLetterChangedListener() {
+        @Override
+        public void onTouchingLetterChanged(String s) {
+            Log.d("sidebar",s);
+            mArraylist.clear();
+            mList =myApplication.prepareSelectCityBych(s);
+            for(int i=0;i<mList.size();i++)
+            {
+                Map<String,String> listitem=new HashMap<String, String>();
+                listitem.put("cityname",mList.get(i).getCity());
+                listitem.put("citycode",mList.get(i).getNumber());
+                Log.d("selectcity",mList.get(i).getCity()+" "+mList.get(i).getNumber());
+                //String cityname=mList.get(i).getCity();
+                mArraylist.add(listitem);
+            }
+            final SimpleAdapter newadapter=new SimpleAdapter(SelectCity.this,mArraylist,R.layout.item,new String[]{"cityname","citycode"},new int[]{R.id.c_name,R.id.c_code});
+
+            CityList.setAdapter(newadapter);
+        }
+    });
+}
 
     @Override
     public void onClick(View v){
