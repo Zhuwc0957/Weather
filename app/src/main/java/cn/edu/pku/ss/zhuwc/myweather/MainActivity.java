@@ -68,6 +68,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import cn.edu.pku.ss.zhuwc.app.MyApplication;
 import cn.edu.pku.ss.zhuwc.bean.TodayWeather;
+import cn.edu.pku.ss.zhuwc.service.MyService;
 import util.NetUtil;
 
 import static android.R.attr.delay;
@@ -217,6 +218,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         mCitySelect=(ImageView)findViewById(R.id.title_city_manager);
         mCitySelect.setOnClickListener(this);
+
+        startService(new Intent(this,MyService.class));
+//        startService(new Intent(this,MyService.class));
+//        stopService(new Intent(this,MyService.class));
+        startService(new Intent(this,MyService.class));
+        stopService(new Intent(this,MyService.class));
     }
     @Override
     public void onClick(View view)

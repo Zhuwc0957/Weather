@@ -52,7 +52,7 @@
             android:layout_marginRight="10dip"
             android:singleLine="true"
             android:drawableLeft="@drawable/ic_search_black_24dp"
-            android:hint="输入城市名"
+            android:hint="@string/input_city"
             android:textColorHint="#ffcccccc"
             android:layout_height="wrap_content"
             android:textSize="15dip"
