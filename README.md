@@ -1,6 +1,6 @@
 天气预报项目展示
 1. 引导页
-![image](http://github.comZhuwc0957/Weather/raw/master/screenshot/20180102112703.png)
+![image](http://github.com/Zhuwc0957/Weather/raw/master/screenshot/20180102112703.png)
 2. 主页面
 
 
