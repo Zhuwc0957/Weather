@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import cn.edu.pku.ss.zhuwc.myweather.MainActivity;
+import cn.edu.pku.ss.zhuwc.myweather.MyReceiver;
 
 /**
  * Created by zhuwc on 2017/12/27.
@@ -33,15 +34,16 @@ public class MyService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("Myservice", "Myservice->onStartCommand");
 
-        handler = new Handler(Looper.getMainLooper());
+        handler = new Handler();
        // System.out.println("service started");
         handler.post(new Runnable() {
             @Override
             public void run() {
 
-                        Toast.makeText(getApplicationContext(), "service is running", Toast.LENGTH_SHORT).show();
-
-               // onDestroy();
+                    // Toast.makeText(getApplicationContext(), "service is running", Toast.LENGTH_SHORT).show();
+                    Intent i=new Intent("cn.edu.pku.ss.zhuwc.myweather.MYRECEIVER");
+                    sendBroadcast(i);
+                    // onDestroy();
             }
         });
         return super.onStartCommand(intent, flags, startId);

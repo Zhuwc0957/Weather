@@ -1,6 +1,7 @@
 package cn.edu.pku.ss.zhuwc.app;
 
 import android.app.Application;
+import android.content.Intent;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -17,6 +18,7 @@ import java.util.ListIterator;
 
 import cn.edu.pku.ss.zhuwc.bean.City;
 import cn.edu.pku.ss.zhuwc.db.CityDB;
+import cn.edu.pku.ss.zhuwc.service.MyService;
 
 /**
  * Created by ZhuWC on 2017/10/18.
@@ -27,6 +29,43 @@ public class MyApplication extends Application {
     private static MyApplication mApplication;
     private CityDB mCityDB;
     private List<City> mCityList;
+    private String weathertype;
+    private String wind;
+    private String todaydate;
+    private String wendu;
+
+    public String getWeathertype() {
+        return weathertype;
+    }
+
+    public void setWeathertype(String weathertype) {
+        this.weathertype = weathertype;
+    }
+
+    public String getWind() {
+        return wind;
+    }
+
+    public void setWind(String wind) {
+        this.wind = wind;
+    }
+
+    public String getTodaydate() {
+        return todaydate;
+    }
+
+    public void setTodaydate(String todaydate) {
+        this.todaydate = todaydate;
+    }
+
+    public String getWendu() {
+        return wendu;
+    }
+
+    public void setWendu(String wendu) {
+        this.wendu = wendu;
+    }
+
     @Override
     public void onCreate(){
         super.onCreate();
@@ -34,6 +73,7 @@ public class MyApplication extends Application {
         mApplication = this;
         mCityDB=openCityDB();
         initCityList();
+        startService(new Intent(this,MyService.class));
     }
 
     public static MyApplication getInstance(){

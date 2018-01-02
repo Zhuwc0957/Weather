@@ -3,6 +3,7 @@ package cn.edu.pku.ss.zhuwc.myweather;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -77,7 +78,9 @@ import static android.R.attr.delay;
  * Created by ZhuWC on 2017/9/21.
  */
 
-public class MainActivity extends Activity implements View.OnClickListener{
+public class MainActivity extends Activity implements View.OnClickListener,MyReceiver.Message{
+    private MyReceiver myReceiver;
+
     private static final int UPDATE_TODAY_WEATHER=1;
 
     private ImageView mUpdateBtn;
@@ -219,11 +222,16 @@ public class MainActivity extends Activity implements View.OnClickListener{
         mCitySelect=(ImageView)findViewById(R.id.title_city_manager);
         mCitySelect.setOnClickListener(this);
 
-        startService(new Intent(this,MyService.class));
+      //  startService(new Intent(this,MyService.class));
 //        startService(new Intent(this,MyService.class));
 //        stopService(new Intent(this,MyService.class));
-        startService(new Intent(this,MyService.class));
-        stopService(new Intent(this,MyService.class));
+        //startService(new Intent(this,MyService.class));
+        //stopService(new Intent(this,MyService.class));
+        myReceiver=new MyReceiver();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("cn.edu.pku.ss.zhuwc.myweather.MYRECEIVER");
+        registerReceiver(myReceiver, intentFilter);
+        myReceiver.setMessage(this);
     }
     @Override
     public void onClick(View view)
@@ -686,6 +694,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
             else
                 pmImg.setImageResource(R.drawable.biz_plugin_weather_greater_300);
         }
+        myApplication=MyApplication.getInstance();
+        myApplication.setTodaydate(todayWeather.getDate());
+        myApplication.setWeathertype(todayWeather.getType());
+        myApplication.setWendu(todayWeather.getWendu());
+        myApplication.setWind(todayWeather.getFengli());
         cityTv.setText(todayWeather.getCity());
         timeTv.setText(todayWeather.getUpdatetime()+ "发布");
         humidityTv.setText("湿度："+todayWeather.getShidu());
@@ -722,6 +735,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
         windTv.setText("风力:"+todayWeather.getFengli());
         tempTv.setText("温度:"+todayWeather.getWendu()+"℃");
         Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void getMsg(String str) {
+        mUpdateBtn.performClick();
+        Log.d("updatetest","suss");
     }
 
     class MyLocationListeners implements BDLocationListener {
